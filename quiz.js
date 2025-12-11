@@ -304,7 +304,7 @@ function generateReportHTML(score, maxScore, percent) {
   reportHTML += '</div>';
   reportHTML += '<div style="margin-top: 20px; text-align: center;">';
   reportHTML += '<button onclick="window.print()" style="padding: 10px 20px; margin: 5px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir</button>';
-  reportHTML += '<button onclick="downloadReport()" style="padding: 10px 20px; margin: 5px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Descargar PDF</button>';
+  reportHTML += '<button  style="padding: 10px 20px; margin: 5px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Descargar PDF</button>';
   reportHTML += '</div></div>';
   
   return reportHTML;
@@ -330,4 +330,54 @@ window.addEventListener('DOMContentLoaded', () => {
   initializeRandomizedQuestions();
   renderQuestion(currentIndex);
   startTimer();
+
+window.escapeHtml = function(text) {
+  const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+};
+
+window.downloadReportPDF = function() {
+  const score = document.querySelector('[data-score]') ? parseInt(document.querySelector('[data-score]').getAttribute('data-score')) : 0;
+  const maxScore = document.querySelector('[data-maxscore]') ? parseInt(document.querySelector('[data-maxscore]').getAttribute('data-maxscore')) : 1;
+  const percent = Math.round((score / maxScore) * 100);
+  const date = new Date().toLocaleDateString('es-CO');
+  
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte</title>';
+  html += '<style>body{font-family:Arial;margin:20px;} h1{color:#0066cc;text-align:center;} h2{color:#0066cc;} hr{border:2px solid #0066cc;} .q{margin:15px 0;padding:10px;border-left:4px solid #0066cc;background:#f9f9f9;} .ok{color:green;font-weight:bold;} .bad{color:red;font-weight:bold;} .sum{text-align:center;margin-top:30px;font-size:18px;color:#0066cc;font-weight:bold;}</style>';
+  html += '</head><body>';
+  html += '<h1>REPORTE DE CALIFICACION DEL QUIZ</h1><hr>';
+  html += '<p><b>Nombre:</b> ' + studentName + '</p>';
+  html += '<p><b>Fecha:</b> ' + date + '</p>';
+  html += '<p><b>Puntuacion:</b> ' + score + ' / ' + maxScore + ' (' + percent + '%)</p><hr>';
+  html += '<h2>DETALLE DE RESPUESTAS</h2>';
+  
+  randomizedQuestions.forEach((q, idx) => {
+    const userAnswer = answers[idx];
+    const correctOption = q.options[q.originalCorrectIndex];
+    const isCorrect = userAnswer !== null && q.options[userAnswer] === correctOption;
+    const userText = userAnswer !== null ? q.options[userAnswer] : 'No respondida';
+    const status = isCorrect ? '<span class="ok">CORRECTA</span>' : '<span class="bad">INCORRECTA</span>';
+    
+    html += '<div class="q">';
+    html += '<b>Pregunta ' + (idx + 1) + ' (' + q.points + 'pts)</b><br/>';
+    html += '' + q.text + '<br/>';
+    html += '<b>Tu respuesta:</b> ' + userText + '<br/>';
+    if (!isCorrect) {
+      html += '<b>Respuesta correcta:</b> ' + correctOption + '<br/>';
+    }
+    html += '<b>Estado:</b> ' + status + '</div>';
+  });
+  
+  html += '<div class="sum">PUNTUACION FINAL: ' + score + ' / ' + maxScore + ' (' + percent + '%)</div>';
+  html += '</body></html>';
+  
+  const element = document.createElement('a');
+  element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(html));
+  element.setAttribute('download', studentName + '_reporte_' + new Date().getTime() + '.html');
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+};
+
 });
