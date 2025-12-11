@@ -4,8 +4,6 @@ let finished = false;
 
 const correctSound = new Audio("correct.mp3");
 correctSound.volume = 0.5;
-const incorrectSound = new Audio("incorrect.mp3");
-incorrectSound.volume = 0.5;
 
 const questionContainer = document.getElementById("question-container");
 const prevBtn = document.getElementById("prev-btn");
@@ -171,8 +169,8 @@ nextBtn.addEventListener("click", () => {
       correctSound.currentTime = 0;
       correctSound.play().catch(() => {});
     } else {
-      incorrectSound.currentTime = 0;
-      incorrectSound.play().catch(() => {});
+      correctSound.currentTime = 0;
+      correctSound.play().catch(() => {});
     }
     answers[currentIndex] = parseInt(selectedAnswer.value);
   }
