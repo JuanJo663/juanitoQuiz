@@ -247,6 +247,9 @@ function generateDetailedSummary(score, maxScore, percent) {
     const color = isCorrect ? '#28a745' : '#dc3545';
     const status = isCorrect ? 'CORRECTA' : 'INCORRECTA';
     
+     html += '<div style="margin: 8px 0;"><strong>Pregunta:</strong> ' + questionTexts[idx].replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", 
+": "&#34;", "'":  "&#39;"}[c])) + '</div>';
+    
     html += '<div style="border-left: 4px solid ' + color + '; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 4px;">';
     html += '<div style="color: ' + color + '; font-weight: bold; font-size: 16px; margin-bottom: 10px;">' + icon + ' Q' + (idx + 1) + ' (' + q.points + 'pt) - ' + status + '</div>';
     html += '<div style="margin: 8px 0;"><strong>Tu respuesta:</strong> <span style="color: ' + color + ';">' + userText + '</span></div>';
