@@ -5,6 +5,8 @@ let timerInterval = null;
 let timeRemaining = 60;
 let randomizedQuestions = [];
 let questionIndexMap = {};
+let studentName = ''; // Nombre del estudiante
+let quizStartTime = null; // Hora de inicio del quiz
 
 const correctSound = new Audio('correct.mp3');
 correctSound.volume = 0.5;
@@ -189,7 +191,7 @@ function finishQuiz() {
   
   saveQuizAttempt(score, maxScore, percent, answers);
   resultBox.classList.remove('hidden');
-  resultBox.innerHTML = generateDetailedSummary(score, maxScore, percent);
+  resultBox.innerHTML = '<div id="report-content">' + generateReportHTML(score, maxScore, percent) + '</div>';
   updateControls();
 }
 
@@ -258,8 +260,73 @@ function generateDetailedSummary(score, maxScore, percent) {
   
   return html;
 }
+// FUNCIONES PARA NOMBRE Y DESCARGA DE REPORTE
+function showNameDialog() {
+  let nameInput = prompt('Ingrese su nombre para registrar en el reporte:', 'Estudiante');
+  if (nameInput !== null && nameInput.trim() !== '') {
+    studentName = nameInput.trim();
+  } else {
+    studentName = 'Estudiante Anonimo';
+  }
+  quizStartTime = new Date();
+}
+
+function generateReportHTML(score, maxScore, percent) {
+  const date = new Date().toLocaleDateString('es-CO');
+  let reportHTML = '<div style="padding: 20px; font-family: Arial, sans-serif;">';
+  reportHTML += '<h1 style="color: #0066cc; text-align: center;">REPORTE DE CALIFICACION DEL QUIZ</h1>';
+  reportHTML += '<hr style="border: 2px solid #0066cc;">';
+  reportHTML += '<p><strong>Nombre:</strong> ' + studentName + '</p>';
+  reportHTML += '<p><strong>Fecha:</strong> ' + date + '</p>';
+  reportHTML += '<p><strong>Puntuacion:</strong> ' + score + ' / ' + maxScore + ' (' + percent + '%)</p>';
+  reportHTML += '<hr>';
+  reportHTML += '<h2 style="color: #0066cc;">DETALLE DE RESPUESTAS</h2>';
+  
+  randomizedQuestions.forEach((q, idx) => {
+    const userAnswer = answers[idx];
+    const correctOption = q.options[q.originalCorrectIndex];
+    const isCorrect = userAnswer !== null && q.options[userAnswer] === correctOption;
+    const userText = userAnswer !== null ? q.options[userAnswer] : 'No respondida';
+    const statusColor = isCorrect ? '#28a745' : '#dc3545';
+    
+    reportHTML += '<div style="margin: 15px 0; padding: 10px; border-left: 4px solid ' + statusColor + '; background: #f9f9f9;">';
+    reportHTML += '<p><strong>Pregunta ' + (idx + 1) + ' (' + q.points + 'pts):</strong> ' + q.text + '</p>';
+    reportHTML += '<p><strong>Tu respuesta:</strong> <span style="color: ' + statusColor + ';">' + userText + '</span></p>';
+    if (!isCorrect) {
+      reportHTML += '<p><strong>Respuesta correcta:</strong> <span style="color: #28a745;">' + correctOption + '</span></p>';
+    }
+    reportHTML += '</div>';
+  });
+  
+  reportHTML += '<hr>';
+  reportHTML += '<div style="background: #f0f0f0; padding: 15px; border-radius: 5px; text-align: center;">';
+  reportHTML += '<h3 style="color: #0066cc;">Puntuacion Final: ' + score + ' / ' + maxScore + ' (' + percent + '%)</h3>';
+  reportHTML += '</div>';
+  reportHTML += '<div style="margin-top: 20px; text-align: center;">';
+  reportHTML += '<button onclick="window.print()" style="padding: 10px 20px; margin: 5px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir</button>';
+  reportHTML += '<button onclick="downloadReport()" style="padding: 10px 20px; margin: 5px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Descargar PDF</button>';
+  reportHTML += '</div></div>';
+  
+  return reportHTML;
+}
+
+function downloadReport() {
+  const element = document.createElement('a');
+  const reportDiv = document.querySelector('[id="report-content"]');
+  if (reportDiv) {
+    const htmlContent = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte</title></head><body>' + reportDiv.innerHTML + '</body></html>';
+    element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlContent));
+    element.setAttribute('download', studentName + '_reporte_' + new Date().getTime() + '.html');
+    element.style.display = 'none';
+
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+}
 window.addEventListener('DOMContentLoaded', () => {
   resultBox.classList.add('hidden');
+  showNameDialog();
   initializeRandomizedQuestions();
   renderQuestion(currentIndex);
   startTimer();
