@@ -231,24 +231,33 @@ function startTimer() {
 }
 
 function generateDetailedSummary(score, maxScore, percent) {
-  let summaryHTML = '<div style="max-height: 70vh; overflow-y: auto;"><h2 style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">Resumen Detallado del Examen</h2>';
+  let html = '<div style="max-height: 70vh; overflow-y: auto;">';
+  html += '<h2 style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">Resumen Detallado</h2>';
   
   randomizedQuestions.forEach((q, idx) => {
     const userAnswer = answers[idx];
     const correctOption = q.options[q.originalCorrectIndex];
     const isCorrect = userAnswer !== null && q.options[userAnswer] === correctOption;
-    const userAnswerText = userAnswer !== null ? q.options[userAnswer] : 'No respondida';
-    const statusIcon = isCorrect ? '✓' : '✗';
-    const statusColor = isCorrect ? '#28a745' : '#dc3545';
+    const userText = userAnswer !== null ? q.options[userAnswer] : 'No respondida';
+    const icon = isCorrect ? '✓' : '✗';
+    const color = isCorrect ? '#28a745' : '#dc3545';
+    const status = isCorrect ? 'CORRECTA' : 'INCORRECTA';
     
-    summaryHTML += `<div style="border-left: 4px solid ${statusColor}; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 4px;"><div style="color: ${statusColor}; font-weight: bold; font-size: 16px; margin-bottom: 10px;">${statusIcon} Pregunta ${idx + 1} (${q.points} puntos) - ${isCorrect ? 'CORRECTA' : 'INCORRECTA'}</div><div style="margin: 8px 0;"><strong>Tu respuesta:</strong> <span style="color: ${statusColor};">${userAnswerText}</span></div>${!isCorrect ? `<div style="margin: 8px 0;"><strong>Respuesta correcta:</strong> <span style="color: #28a745;">${correctOption}</span></div>` : ''}</div>`;
+    html += '<div style="border-left: 4px solid ' + color + '; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 4px;">';
+    html += '<div style="color: ' + color + '; font-weight: bold; font-size: 16px; margin-bottom: 10px;">' + icon + ' Q' + (idx + 1) + ' (' + q.points + 'pt) - ' + status + '</div>';
+    html += '<div style="margin: 8px 0;"><strong>Tu respuesta:</strong> <span style="color: ' + color + ';">' + userText + '</span></div>';
+    if (!isCorrect) {
+      html += '<div style="margin: 8px 0;"><strong>Respuesta correcta:</strong> <span style="color: #28a745;">' + correctOption + '</span></div>';
+    }
+    html += '</div>';
   });
   
-  summaryHTML += `</div><div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border-top: 2px solid #0066cc;"><div style="font-size: 18px; font-weight: bold; color: #0066cc;">Puntuacion Final: ${score} / ${maxScore} (${percent}%)</div></div>`;
+  html += '</div><div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border-top: 2px solid #0066cc;">';
+  html += '<div style="font-size: 18px; font-weight: bold; color: #0066cc;">Puntuacion Final: ' + score + ' / ' + maxScore + ' (' + percent + '%)</div>';
+  html += '</div>';
   
-  return summaryHTML;
+  return html;
 }
-
 window.addEventListener('DOMContentLoaded', () => {
   resultBox.classList.add('hidden');
   initializeRandomizedQuestions();
