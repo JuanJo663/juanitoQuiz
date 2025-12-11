@@ -7,6 +7,7 @@ let randomizedQuestions = [];
 let questionIndexMap = {};
 let studentName = ''; // Nombre del estudiante
 let quizStartTime = null; // Hora de inicio del quiz
+let questionTexts = []; // Textos originales de las preguntas
 
 const correctSound = new Audio('correct.mp3');
 correctSound.volume = 0.5;
@@ -71,6 +72,7 @@ function initializeRandomizedQuestions() {
     options: shuffleArray(q.options),
     originalCorrectIndex: q.correctIndex
   }));
+  questionTexts = questions.map(q => q.text); // Guardar textos originales
 }
 
 // FUNCION DE BARRA DE PROGRESO
@@ -360,7 +362,7 @@ window.downloadReportPDF = function() {
     
     html += '<div class="q">';
     html += '<b>Pregunta ' + (idx + 1) + ' (' + q.points + 'pts)</b><br/>';
-    html += '' + q.text + '<br/>';
+     + '<br/>';
     html += '<b>Tu respuesta:</b> ' + userText + '<br/>';
     if (!isCorrect) {
       html += '<b>Respuesta correcta:</b> ' + correctOption + '<br/>';
