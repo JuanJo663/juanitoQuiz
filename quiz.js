@@ -58,13 +58,13 @@ function renderQuestion(index) {
 
         if (i === q.correctIndex) {
           label.classList.add("correct");
-          feedback.textContent = "\u2713 Correct! Well done.";
-          feedback.classList.remove("hidden");
+//           feedback.textContent = "\u2713 Correct! Well done.";
+//           feedback.classList.remove("hidden");
           correctSound.currentTime = 0;
         } else {
           label.classList.add("incorrect");
-          feedback.textContent = "\u2717 Not quite. Try another option.";
-          feedback.classList.remove("hidden");
+//           feedback.textContent = "\u2717 Not quite. Try another option.";
+//           feedback.classList.remove("hidden");
         }
       }
     });
@@ -172,6 +172,19 @@ nextBtn.addEventListener("click", () => {
       correctSound.currentTime = 0;
       correctSound.play().catch(() => {});
     }
+      const feedback = document.querySelector(`.question-card:nth-child(${currentIndex + 1}) .question-feedback`);
+  if (feedback) {
+    if (parseInt(selectedAnswer.value) === q.correctIndex) {
+      feedback.textContent = "\u2713 Correct! Well done.";
+      feedback.classList.remove("incorrect");
+      feedback.classList.add("correct");
+    } else {
+      feedback.textContent = "\u2717 Not quite. Try another option.";
+      feedback.classList.remove("correct");
+      feedback.classList.add("incorrect");
+    }
+    feedback.classList.remove("hidden");
+  }
     answers[currentIndex] = parseInt(selectedAnswer.value);
   }
   
