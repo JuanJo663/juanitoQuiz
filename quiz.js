@@ -1,6 +1,8 @@
 let currentIndex = 0;
 let answers = new Array(questions.length).fill(null);
 let finished = false;
+let timerInterval = null;
+let timeRemaining = 60 * 60; // 60 minutos en segundos
 
 const correctSound = new Audio("correct.mp3");
 correctSound.volume = 0.5;
@@ -142,12 +144,7 @@ function finishQuiz() {
   }
 
   resultBox.classList.remove("hidden");
-  resultBox.innerHTML = `
-    <div>${good ? "🎉 Excellent work! You passed!" : "Keep practicing, you're making progress!"}</div>
-    <div class="score ${good ? "good" : "bad"}">
-      Score: ${score} / ${maxScore} (${percent}%)
-    </div>
-  `;
+  resultBox.innerHTML = generateDetailedSummary();
 
   updateControls();
 }
@@ -197,7 +194,53 @@ finishBtn.addEventListener("click", () => {
   finishQuiz();
 });
 
+function startTimer() {
+  const timerElement = document.createElement("div");
+  timerElement.id = "timer";
+  timerElement.style.cssText = "position: fixed; top: 20px; right: 20px; font-size: 18px; font-weight: bold; color: #0066cc; background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1000;";
+  document.body.appendChild(timerElement);
+  
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, "0")}`;
+    
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      finishQuiz();
+    }
+  }, 1000);
+}
+
+function generateDetailedSummary() {
+  let summaryHTML = '<div style="max-height: 70vh; overflow-y: auto;"><h2 style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">Resumen Detallado del Examen</h2>';
+  
+  questions.forEach((q, idx) => {
+    const userAnswer = answers[idx];
+    const isCorrect = userAnswer === q.correctIndex;
+    const userAnswerText = userAnswer !== null ? q.options[userAnswer] : 'No respondida';
+    const correctAnswerText = q.options[q.correctIndex];
+    const statusIcon = isCorrect ? '✓' : '✗';
+    const statusColor = isCorrect ? '#28a745' : '#dc3545';
+    
+    summaryHTML += `<div style="border-left: 4px solid ${statusColor}; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 4px;"><div style="color: ${statusColor}; font-weight: bold; font-size: 16px; margin-bottom: 10px;">${statusIcon} Pregunta ${idx + 1} (${q.points} puntos) - ${isCorrect ? 'CORRECTA' : 'INCORRECTA'}</div><div style="margin: 8px 0;"><strong>Tu respuesta:</strong> <span style="color: ${statusColor};">${userAnswerText}</span></div>${!isCorrect ? `<div style="margin: 8px 0;"><strong>Respuesta correcta:</strong> <span style="color: #28a745;">${correctAnswerText}</span></div>` : ''}</div>`;
+  });
+  
+  let score = 0;
+  questions.forEach((q, idx) => {
+    if (answers[idx] === q.correctIndex) score += q.points;
+  });
+  const maxScore = questions.reduce((acc, q) => acc + q.points, 0);
+  const percent = Math.round((score / maxScore) * 100);
+  
+  summaryHTML += `</div><div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border-top: 2px solid #0066cc;"><div style="font-size: 18px; font-weight: bold; color: #0066cc;">Puntuación Final: ${score} / ${maxScore} (${percent}%)</div></div>`;
+  
+  resultBox.innerHTML = summaryHTML;
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   resultBox.classList.add("hidden");
   renderQuestion(currentIndex);
+    startTimer();
 });
