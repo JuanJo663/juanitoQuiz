@@ -57,12 +57,12 @@ function renderQuestion(index) {
           .forEach(l => l.classList.remove("correct", "incorrect"));
 
         if (i === q.correctIndex) {
-          label.classList.add("correct");
+//           label.classList.add("correct");
 //           feedback.textContent = "\u2713 Correct! Well done.";
 //           feedback.classList.remove("hidden");
           correctSound.currentTime = 0;
         } else {
-          label.classList.add("incorrect");
+//           label.classList.add("incorrect");
 //           feedback.textContent = "\u2717 Not quite. Try another option.";
 //           feedback.classList.remove("hidden");
         }
