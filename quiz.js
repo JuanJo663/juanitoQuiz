@@ -2,7 +2,7 @@ let currentIndex = 0;
 let answers = new Array(questions.length).fill(null);
 let finished = false;
 let timerInterval = null;
-let timeRemaining = 60 * 60; // 60 minutos en segundos
+let timeRemaining =  60; // 60 minutos en segundos
 
 const correctSound = new Audio("correct.mp3");
 correctSound.volume = 0.5;
