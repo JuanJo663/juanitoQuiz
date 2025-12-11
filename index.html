@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Juanito Quiz - Calculus Exam</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="quiz-container">
+    <header class="quiz-header">
+      <h1>Juanito Quiz - Calculus</h1>
+      <p>Answer each question and click "Finish" to see your score.</p>
+    </header>
+    <main>
+      <div id="question-container"></div>
+      <div class="quiz-controls">
+        <button id="prev-btn" type="button">Previous</button>
+        <button id="next-btn" type="button">Next</button>
+        <button id="finish-btn" type="button">Finish</button>
+      </div>
+      <section id="result" class="quiz-result" aria-live="polite"></section>
+    </main>
+  </div>
+  <script src="questions.js"></script>
+  <script src="quiz.js"></script>
+</body>
+</html>
