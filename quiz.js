@@ -4,6 +4,8 @@ let finished = false;
 
 const correctSound = new Audio("correct.mp3");
 correctSound.volume = 0.5;
+const incorrectSound = new Audio("incorrect.mp3");
+incorrectSound.volume = 0.5;
 
 const questionContainer = document.getElementById("question-container");
 const prevBtn = document.getElementById("prev-btn");
@@ -61,7 +63,6 @@ function renderQuestion(index) {
           feedback.textContent = "\u2713 Correct! Well done.";
           feedback.classList.remove("hidden");
           correctSound.currentTime = 0;
-          correctSound.play().catch(() => {});
         } else {
           label.classList.add("incorrect");
           feedback.textContent = "\u2717 Not quite. Try another option.";
@@ -162,6 +163,20 @@ prevBtn.addEventListener("click", () => {
 
 nextBtn.addEventListener("click", () => {
   if (currentIndex < questions.length - 1) {
+      const q = questions[currentIndex];
+  const selectedAnswer = document.querySelector(`input[name="question-${currentIndex}"]:checked`);
+  
+  if (selectedAnswer) {
+    if (parseInt(selectedAnswer.value) === q.correctIndex) {
+      correctSound.currentTime = 0;
+      correctSound.play().catch(() => {});
+    } else {
+      incorrectSound.currentTime = 0;
+      incorrectSound.play().catch(() => {});
+    }
+    answers[currentIndex] = parseInt(selectedAnswer.value);
+  }
+  
     currentIndex++;
     renderQuestion(currentIndex);
   }
